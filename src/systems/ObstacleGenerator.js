@@ -45,7 +45,7 @@ export class ObstacleGenerator {
     // Create obstacle (lanes: 1, 2, 3 -> x: -3, 0, 3)
     const laneX = (lane - 2) * 3;
     const obstacle = new Obstacle(
-      { x: laneX, y: 0, z: -distance },
+      { x: laneX, y: 0, z: 100 }, // Spawn at horizon
       type
     );
 

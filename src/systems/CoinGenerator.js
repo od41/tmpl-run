@@ -46,7 +46,7 @@ export class CoinGenerator {
       const coin = new Coin({
         x: laneX,
         y: 0,
-        z: -distance,
+        z: 100, // Spawn at horizon
       });
       this.coins.push(coin);
     }

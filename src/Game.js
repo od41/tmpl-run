@@ -77,6 +77,9 @@ export class Game {
 
     // Update player position in scene
     this.scene.updatePlayerPosition(this.gameState.player.position);
+
+    // Update environment
+    this.scene.update(delta, this.gameState.speed);
   }
 
   updateObstaclesInScene() {
@@ -98,7 +101,7 @@ export class Game {
     }
 
     // Update reference
-    this.gameState.lastObstacles = currentObstacles;
+    this.gameState.lastObstacles = [...currentObstacles];
   }
 
   updateCoinsInScene() {
@@ -120,7 +123,7 @@ export class Game {
     }
 
     // Update reference
-    this.gameState.lastCoins = currentCoins;
+    this.gameState.lastCoins = [...currentCoins];
   }
 
   updateHUD() {

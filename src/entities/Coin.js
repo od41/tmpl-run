@@ -36,8 +36,8 @@ export class Coin {
 
   update(delta, playerSpeed) {
     if (!this.collected && this.mesh) {
-      // Move backward relative to player
-      this.position.z += playerSpeed * delta;
+      // Move toward the player (negative Z)
+      this.position.z -= playerSpeed * delta;
       this.mesh.position.z = this.position.z;
 
       // Rotate coin for visual appeal
@@ -55,8 +55,8 @@ export class Coin {
   }
 
   isOffScreen(playerPosition) {
-    // Remove coin if it's too far behind the player
-    return this.position.z > playerPosition.z + 50;
+    // Remove coin if it's too far behind the player/camera
+    return this.position.z < -20;
   }
 
   collect() {

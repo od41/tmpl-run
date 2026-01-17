@@ -6,6 +6,9 @@ export class Scene {
     this.scene.background = new THREE.Color(0x1a1a1a);
     this.scene.fog = new THREE.Fog(0x1a1a1a, 100, 200);
 
+    // Store references for animation
+    this.columns = [];
+
     this.setupLighting();
     this.setupEnvironment();
     this.setupPlayer();
@@ -49,6 +52,7 @@ export class Scene {
     ground.rotation.x = -Math.PI / 2;
     ground.position.z = 50;
     this.scene.add(ground);
+    this.ground = ground;
 
     // Side walls for lane boundaries
     const wallMaterial = new THREE.MeshStandardMaterial({
@@ -90,8 +94,9 @@ export class Scene {
       column.receiveShadow = true;
 
       const xPos = i % 2 === 0 ? -5 : 5;
-      column.position.set(xPos, 4, i * 20 - 100);
+      column.position.set(xPos, 4, i * 20 - 20); // Adjusted initial positions
       this.scene.add(column);
+      this.columns.push(column);
     }
   }
 
@@ -126,9 +131,31 @@ export class Scene {
     }
   }
 
+  update(delta, speed) {
+    // Move columns backward
+    this.columns.forEach(column => {
+      column.position.z -= speed * delta;
+      // Wrap around from back to front
+      if (column.position.z < -20) {
+        column.position.z += 200;
+      }
+    });
+
+    // Move ground backward
+    if (this.ground) {
+      this.ground.position.z -= speed * delta;
+      if (this.ground.position.z < 0) {
+        this.ground.position.z += 100;
+      }
+    }
+  }
+
   addObstacle(obstacle) {
+    console.log('adding obstacle...')
     if (this.obstaclesGroup && obstacle.getMesh()) {
       this.obstaclesGroup.add(obstacle.getMesh());
+      console.log('obstackles mesh: ', obstacle.getMesh())
+      console.log('obstackles group: ', this.obstaclesGroup)
     }
   }
 

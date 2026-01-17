@@ -42,8 +42,8 @@ export class Obstacle {
   }
 
   update(delta, playerSpeed) {
-    // Obstacles move backward relative to the player
-    this.position.z += playerSpeed * delta;
+    // Obstacles move toward the player (negative Z)
+    this.position.z -= playerSpeed * delta;
     this.mesh.position.z = this.position.z;
   }
 
@@ -54,8 +54,8 @@ export class Obstacle {
   }
 
   isOffScreen(playerPosition) {
-    // Remove obstacle if it's too far behind the player
-    return this.position.z > playerPosition.z + 50;
+    // Remove obstacle if it's too far behind the player/camera
+    return this.position.z < -20;
   }
 }
 

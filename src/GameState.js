@@ -29,7 +29,7 @@ export class GameState {
     this.distance = 0;
     this.coinsCollected = 0;
     this.score = 0;
-    this.speed = 20;
+    this.speed = 8;
     this.isGameOver = false;
     this.player.reset();
     this.obstacleGenerator.reset();

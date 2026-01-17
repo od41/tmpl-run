@@ -35,14 +35,12 @@ export class GameState {
   updatePlayer(input, delta) {
     if (!this.isPlaying) return;
 
-    // Handle lane movement
-    if (input.moveLeft && this.player.currentLane > 0) {
+    // Handle lane movement (lanes: 1, 2, 3)
+    if (input.moveLeft && this.player.currentLane > 1) {
       this.player.currentLane--;
-      this.player.targetLanePosition = (this.player.currentLane - 1) * 3;
     }
     if (input.moveRight && this.player.currentLane < 3) {
       this.player.currentLane++;
-      this.player.targetLanePosition = (this.player.currentLane - 1) * 3;
     }
 
     // Handle jump

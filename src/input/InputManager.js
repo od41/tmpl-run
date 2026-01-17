@@ -84,14 +84,15 @@ export class InputManager {
     this.input.slide = false;
 
     // Keyboard input
-    if (this.keys['arrowleft'] || this.keys['a']) {
+    // Inverted because of scene/camera inversion
+    if (this.keys['arrowright'] || this.keys['d']) {
       if (currentTime - this.lastLaneChangeTime > this.laneChangeCooldown) {
         this.input.moveLeft = true;
         this.lastLaneChangeTime = currentTime;
       }
     }
 
-    if (this.keys['arrowright'] || this.keys['d']) {
+    if (this.keys['arrowleft'] || this.keys['a']) {
       if (currentTime - this.lastLaneChangeTime > this.laneChangeCooldown) {
         this.input.moveRight = true;
         this.lastLaneChangeTime = currentTime;

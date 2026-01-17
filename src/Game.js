@@ -72,6 +72,9 @@ export class Game {
     // Sync obstacles with scene
     this.updateObstaclesInScene();
 
+    // Sync coins with scene
+    this.updateCoinsInScene();
+
     // Update player position in scene
     this.scene.updatePlayerPosition(this.gameState.player.position);
   }
@@ -98,9 +101,31 @@ export class Game {
     this.gameState.lastObstacles = currentObstacles;
   }
 
+  updateCoinsInScene() {
+    const currentCoins = this.gameState.coinGenerator.getCoins();
+    const previousCoins = this.gameState.lastCoins || [];
+
+    // Remove coins that are no longer in the list or have been collected
+    for (const coin of previousCoins) {
+      if (!currentCoins.includes(coin) || coin.isCollected()) {
+        this.scene.removeCoin(coin);
+      }
+    }
+
+    // Add new coins
+    for (const coin of currentCoins) {
+      if (!previousCoins.includes(coin)) {
+        this.scene.addCoin(coin);
+      }
+    }
+
+    // Update reference
+    this.gameState.lastCoins = currentCoins;
+  }
+
   updateHUD() {
     document.getElementById('distance').textContent = Math.floor(this.gameState.distance);
-    document.getElementById('coins').textContent = this.gameState.coins;
+    document.getElementById('coins').textContent = this.gameState.coinsCollected;
   }
 
   updateFPS() {

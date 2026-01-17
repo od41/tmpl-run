@@ -81,6 +81,30 @@ export class CollisionDetector {
     return false;
   }
 
+  checkCoinCollision(player, coins) {
+    // Get player bounds with larger collision radius for coins
+    const position = player.position;
+    const size = new THREE.Vector3(3, 2, 3); // Larger collection radius for coins
+    const playerBox = new THREE.Box3();
+    playerBox.setFromCenterAndSize(position, size);
+
+    const collectedCoins = [];
+
+    // Check each coin
+    for (const coin of coins) {
+      if (coin.isCollected()) continue;
+
+      const coinBox = coin.getBoundingBox();
+
+      // Perform AABB collision detection
+      if (this.isCollidingAABB(playerBox, coinBox)) {
+        collectedCoins.push(coin);
+      }
+    }
+
+    return collectedCoins;
+  }
+
   reset() {
     this.playerBounds = null;
     this.obstacleBounds = [];

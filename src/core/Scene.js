@@ -113,6 +113,10 @@ export class Scene {
     // Container for obstacles
     this.obstaclesGroup = new THREE.Group();
     this.scene.add(this.obstaclesGroup);
+
+    // Container for coins
+    this.coinsGroup = new THREE.Group();
+    this.scene.add(this.coinsGroup);
   }
 
   updatePlayerPosition(position) {
@@ -131,6 +135,18 @@ export class Scene {
   removeObstacle(obstacle) {
     if (this.obstaclesGroup && obstacle.getMesh()) {
       this.obstaclesGroup.remove(obstacle.getMesh());
+    }
+  }
+
+  addCoin(coin) {
+    if (this.coinsGroup && coin.getMesh()) {
+      this.coinsGroup.add(coin.getMesh());
+    }
+  }
+
+  removeCoin(coin) {
+    if (this.coinsGroup && coin.getMesh()) {
+      this.coinsGroup.remove(coin.getMesh());
     }
   }
 

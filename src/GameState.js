@@ -1,35 +1,42 @@
 import * as THREE from 'three';
 import { Player } from './entities/Player.js';
 import { ObstacleGenerator } from './systems/ObstacleGenerator.js';
+import { CoinGenerator } from './systems/CoinGenerator.js';
 import { CollisionDetector } from './systems/CollisionDetector.js';
 
 export class GameState {
   constructor() {
     this.player = new Player();
     this.distance = 0;
-    this.coins = 0;
+    this.coinsCollected = 0;
+    this.score = 0;
     this.speed = 20; // units per second
     this.maxSpeed = 50;
     this.acceleration = 5; // units per second squared
     this.isGameOver = false;
     this.isPlaying = false;
 
-    // New systems for Week 2
+    // New systems for Week 2 and Week 3
     this.obstacleGenerator = new ObstacleGenerator();
+    this.coinGenerator = new CoinGenerator();
     this.collisionDetector = new CollisionDetector();
     this.lastObstacles = [];
+    this.lastCoins = [];
   }
 
   startGame() {
     this.isPlaying = true;
     this.distance = 0;
-    this.coins = 0;
+    this.coinsCollected = 0;
+    this.score = 0;
     this.speed = 20;
     this.isGameOver = false;
     this.player.reset();
     this.obstacleGenerator.reset();
+    this.coinGenerator.reset();
     this.collisionDetector.reset();
     this.lastObstacles = [];
+    this.lastCoins = [];
   }
 
   updatePlayer(input, delta) {
@@ -67,6 +74,9 @@ export class GameState {
     // Update distance based on speed
     this.distance += this.speed * delta;
 
+    // Score from distance
+    this.score = Math.floor(this.distance) + this.coinsCollected * 10;
+
     // Gradually increase difficulty
     const speedMultiplier = Math.min(1 + this.distance / 5000, 2);
     this.maxSpeed = 50 * speedMultiplier;
@@ -74,11 +84,22 @@ export class GameState {
     // Generate and update obstacles
     this.obstacleGenerator.update(delta, this.distance, this.player.position, this.speed);
 
-    // Check collisions
+    // Generate and update coins
+    this.coinGenerator.update(delta, this.distance, this.player.position, this.speed);
+
+    // Check obstacle collisions
     const obstacles = this.obstacleGenerator.getObstacles();
     if (this.collisionDetector.checkCollision(this.player, obstacles)) {
       this.gameOver();
       return;
+    }
+
+    // Check coin collisions
+    const coins = this.coinGenerator.getCoins();
+    const collectedCoins = this.collisionDetector.checkCoinCollision(this.player, coins);
+    for (const coin of collectedCoins) {
+      this.coinGenerator.collectCoin(coin);
+      this.coinsCollected += 1;
     }
 
     // Check boundary collisions

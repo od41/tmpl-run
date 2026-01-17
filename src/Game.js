@@ -68,6 +68,34 @@ export class Game {
 
     // Update game state
     this.gameState.update(delta, elapsed);
+
+    // Sync obstacles with scene
+    this.updateObstaclesInScene();
+
+    // Update player position in scene
+    this.scene.updatePlayerPosition(this.gameState.player.position);
+  }
+
+  updateObstaclesInScene() {
+    const currentObstacles = this.gameState.obstacleGenerator.getObstacles();
+    const previousObstacles = this.gameState.lastObstacles || [];
+
+    // Remove obstacles that are no longer in the list
+    for (const obstacle of previousObstacles) {
+      if (!currentObstacles.includes(obstacle)) {
+        this.scene.removeObstacle(obstacle);
+      }
+    }
+
+    // Add new obstacles
+    for (const obstacle of currentObstacles) {
+      if (!previousObstacles.includes(obstacle)) {
+        this.scene.addObstacle(obstacle);
+      }
+    }
+
+    // Update reference
+    this.gameState.lastObstacles = currentObstacles;
   }
 
   updateHUD() {

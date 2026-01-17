@@ -80,6 +80,8 @@ export class InputManager {
     // Reset inputs
     this.input.moveLeft = false;
     this.input.moveRight = false;
+    this.input.jump = false;
+    this.input.slide = false;
 
     // Keyboard input
     if (this.keys['arrowleft'] || this.keys['a']) {
@@ -96,8 +98,13 @@ export class InputManager {
       }
     }
 
-    this.input.jump = this.keys['arrowup'] || this.keys['w'] || this.keys[' '];
-    this.input.slide = this.keys['arrowdown'] || this.keys['s'];
+    if (this.keys['arrowup'] || this.keys['w'] || this.keys[' ']) {
+      this.input.jump = true;
+    }
+
+    if (this.keys['arrowdown'] || this.keys['s']) {
+      this.input.slide = true;
+    }
   }
 
   getInput() {

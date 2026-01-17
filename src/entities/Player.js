@@ -23,9 +23,9 @@ export class Player {
     // Animation
     this.laneTransitionSpeed = 10;
 
-    // Bounds
-    this.minLaneX = -3;
-    this.maxLaneX = 3;
+    // Bounds (lanes: 1, 2, 3)
+    this.minLane = 1;
+    this.maxLane = 3;
   }
 
   reset() {
@@ -55,8 +55,8 @@ export class Player {
   }
 
   update(delta) {
-    // Update lane position smoothly
-    const currentLaneX = (this.currentLane - 1) * 3;
+    // Update lane position smoothly (lanes: 1, 2, 3 -> x: 0, 3, 6 or -3, 0, 3)
+    const currentLaneX = (this.currentLane - 2) * 3; // Centers at lane 2 (x=0)
     if (Math.abs(this.position.x - currentLaneX) > 0.1) {
       this.position.x += (currentLaneX - this.position.x) * this.laneTransitionSpeed * delta;
     } else {

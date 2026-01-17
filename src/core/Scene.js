@@ -109,12 +109,28 @@ export class Scene {
     this.playerMesh.receiveShadow = true;
     this.playerMesh.position.set(0, 1.25, 0);
     this.scene.add(this.playerMesh);
+
+    // Container for obstacles
+    this.obstaclesGroup = new THREE.Group();
+    this.scene.add(this.obstaclesGroup);
   }
 
   updatePlayerPosition(position) {
     if (this.playerMesh) {
       this.playerMesh.position.copy(position);
       this.playerMesh.position.y += 1.25; // Offset for mesh center
+    }
+  }
+
+  addObstacle(obstacle) {
+    if (this.obstaclesGroup && obstacle.getMesh()) {
+      this.obstaclesGroup.add(obstacle.getMesh());
+    }
+  }
+
+  removeObstacle(obstacle) {
+    if (this.obstaclesGroup && obstacle.getMesh()) {
+      this.obstaclesGroup.remove(obstacle.getMesh());
     }
   }
 

@@ -1,5 +1,7 @@
 import * as THREE from 'three';
 import { Player } from './entities/Player.js';
+import { ObstacleGenerator } from './systems/ObstacleGenerator.js';
+import { CollisionDetector } from './systems/CollisionDetector.js';
 
 export class GameState {
   constructor() {
@@ -11,6 +13,11 @@ export class GameState {
     this.acceleration = 5; // units per second squared
     this.isGameOver = false;
     this.isPlaying = false;
+
+    // New systems for Week 2
+    this.obstacleGenerator = new ObstacleGenerator();
+    this.collisionDetector = new CollisionDetector();
+    this.lastObstacles = [];
   }
 
   startGame() {
@@ -20,6 +27,9 @@ export class GameState {
     this.speed = 20;
     this.isGameOver = false;
     this.player.reset();
+    this.obstacleGenerator.reset();
+    this.collisionDetector.reset();
+    this.lastObstacles = [];
   }
 
   updatePlayer(input, delta) {
@@ -62,6 +72,22 @@ export class GameState {
     // Gradually increase difficulty
     const speedMultiplier = Math.min(1 + this.distance / 5000, 2);
     this.maxSpeed = 50 * speedMultiplier;
+
+    // Generate and update obstacles
+    this.obstacleGenerator.update(delta, this.distance, this.player.position, this.speed);
+
+    // Check collisions
+    const obstacles = this.obstacleGenerator.getObstacles();
+    if (this.collisionDetector.checkCollision(this.player, obstacles)) {
+      this.gameOver();
+      return;
+    }
+
+    // Check boundary collisions
+    if (this.collisionDetector.checkBoundaries(this.player)) {
+      this.gameOver();
+      return;
+    }
   }
 
   gameOver() {

@@ -4,6 +4,7 @@ import { Camera } from './core/Camera.js';
 import { Renderer } from './core/Renderer.js';
 import { InputManager } from './input/InputManager.js';
 import { GameState } from './GameState.js';
+import { AudioManager } from './audio/AudioManager.js';
 
 export class Game {
   constructor() {
@@ -11,12 +12,15 @@ export class Game {
     this.height = window.innerHeight;
     this.aspect = this.width / this.height;
 
+    // Audio first
+    this.audio = new AudioManager();
+
     // Core systems
     this.renderer = new Renderer(this.width, this.height);
     this.scene = new Scene();
     this.camera = new Camera(this.aspect);
     this.input = new InputManager();
-    this.gameState = new GameState();
+    this.gameState = new GameState(this.audio);
 
     // Game loop
     this.clock = new THREE.Clock();
@@ -26,11 +30,19 @@ export class Game {
     this.frameCount = 0;
     this.lastFpsUpdate = 0;
     this.fps = 60;
+
+    // UI Manager
+    this.uiManager = null;
+  }
+
+  setUIManager(uiManager) {
+    this.uiManager = uiManager;
   }
 
   start() {
     this.isRunning = true;
     this.gameState.startGame();
+    this.audio.startMusic();
     this.animate();
   }
 
@@ -53,6 +65,16 @@ export class Game {
 
     // Update FPS
     this.updateFPS();
+
+    // Check for game over
+    if (this.gameState.isGameOver && this.uiManager) {
+      this.isRunning = false;
+      this.uiManager.showGameOver({
+        score: this.gameState.score,
+        distance: this.gameState.distance,
+        coinsCollected: this.gameState.coinsCollected
+      });
+    }
   };
 
   update(delta, elapsed) {
@@ -127,8 +149,13 @@ export class Game {
   }
 
   updateHUD() {
-    document.getElementById('distance').textContent = Math.floor(this.gameState.distance);
-    document.getElementById('coins').textContent = this.gameState.coinsCollected;
+    if (this.uiManager) {
+      this.uiManager.updateHUD({
+        distance: this.gameState.distance,
+        coinsCollected: this.gameState.coinsCollected,
+        score: this.gameState.score
+      });
+    }
   }
 
   updateFPS() {
@@ -160,6 +187,12 @@ export class Game {
     this.isRunning = true;
     this.clock.start();
     this.animate();
+  }
+
+  destroy() {
+    this.isRunning = false;
+    this.audio.dispose();
+    this.renderer.dispose();
   }
 }
 

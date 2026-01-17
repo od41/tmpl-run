@@ -151,11 +151,8 @@ export class Scene {
   }
 
   addObstacle(obstacle) {
-    console.log('adding obstacle...')
     if (this.obstaclesGroup && obstacle.getMesh()) {
       this.obstaclesGroup.add(obstacle.getMesh());
-      console.log('obstackles mesh: ', obstacle.getMesh())
-      console.log('obstackles group: ', this.obstaclesGroup)
     }
   }
 

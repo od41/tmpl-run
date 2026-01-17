@@ -5,14 +5,14 @@ import { CoinGenerator } from './systems/CoinGenerator.js';
 import { CollisionDetector } from './systems/CollisionDetector.js';
 
 export class GameState {
-  constructor() {
+  constructor(audioManager = null) {
     this.player = new Player();
     this.distance = 0;
     this.coinsCollected = 0;
     this.score = 0;
-    this.speed = 20; // units per second
-    this.maxSpeed = 50;
-    this.acceleration = 5; // units per second squared
+    this.speed = 15; // units per second
+    this.maxSpeed = 30;
+    this.acceleration = 0.002; // units per second squared
     this.isGameOver = false;
     this.isPlaying = false;
 
@@ -22,6 +22,18 @@ export class GameState {
     this.collisionDetector = new CollisionDetector();
     this.lastObstacles = [];
     this.lastCoins = [];
+
+    // Audio
+    this.audioManager = audioManager;
+
+    // Scoring
+    this.multiplier = 1;
+    this.obstaclesAvoided = 0;
+    this.lastCoinsCollected = 0;
+  }
+
+  setAudioManager(audioManager) {
+    this.audioManager = audioManager;
   }
 
   startGame() {
@@ -29,8 +41,11 @@ export class GameState {
     this.distance = 0;
     this.coinsCollected = 0;
     this.score = 0;
-    this.speed = 8;
+    this.speed = 15;
     this.isGameOver = false;
+    this.multiplier = 1;
+    this.obstaclesAvoided = 0;
+    this.lastCoinsCollected = 0;
     this.player.reset();
     this.obstacleGenerator.reset();
     this.coinGenerator.reset();
@@ -53,11 +68,13 @@ export class GameState {
     // Handle jump
     if (input.jump && this.player.canJump) {
       this.player.jump();
+      this.audioManager?.playSound('jump', 0.2);
     }
 
     // Handle slide
     if (input.slide) {
       this.player.slide();
+      this.audioManager?.playSound('slide', 0.15);
     }
 
     this.player.update(delta);
@@ -74,12 +91,21 @@ export class GameState {
     // Update distance based on speed
     this.distance += this.speed * delta;
 
-    // Score from distance
-    this.score = Math.floor(this.distance) + this.coinsCollected * 10;
+    // Enhanced scoring: distance + coins + multiplier bonus
+    const distanceScore = Math.floor(this.distance);
+    const coinScore = this.coinsCollected * 10;
+    const multiplierBonus = Math.floor((this.obstaclesAvoided / 5) * this.multiplier);
+    
+    this.score = (distanceScore + coinScore + multiplierBonus) * this.multiplier;
+
+    // Update multiplier based on consecutive obstacles avoided
+    if (this.obstaclesAvoided % 5 === 0 && this.obstaclesAvoided > 0) {
+      this.multiplier = Math.min(this.multiplier + 0.1, 3);
+    }
 
     // Gradually increase difficulty
     const speedMultiplier = Math.min(1 + this.distance / 5000, 2);
-    this.maxSpeed = 50 * speedMultiplier;
+    this.maxSpeed = 30 * speedMultiplier;
 
     // Generate and update obstacles
     this.obstacleGenerator.update(delta, this.distance, this.player.position, this.speed);
@@ -100,6 +126,7 @@ export class GameState {
     for (const coin of collectedCoins) {
       this.coinGenerator.collectCoin(coin);
       this.coinsCollected += 1;
+      this.audioManager?.playSound('coin', 0.1);
     }
 
     // Check boundary collisions
@@ -112,6 +139,7 @@ export class GameState {
   gameOver() {
     this.isPlaying = false;
     this.isGameOver = true;
+    this.audioManager?.playSound('crash', 0.3);
   }
 }
 

@@ -33,5 +33,13 @@ export class Renderer {
     this.renderer.setSize(width, height);
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   }
+
+  dispose() {
+    this.renderer.dispose();
+    const container = document.getElementById('canvas-container');
+    if (this.renderer.domElement.parentNode === container) {
+      container.removeChild(this.renderer.domElement);
+    }
+  }
 }
 
